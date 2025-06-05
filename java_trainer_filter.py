@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import io
 
-st.title("Trainer Filter by Multiple Criteria")
+st.title("Trainer Filter by Skill")
 
 uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
 
@@ -21,17 +21,7 @@ if uploaded_file:
         core_col = st.selectbox("Select the 'Core Areas' column", columns)
 
         # Let user input skill to filter
-        entered_skill = st.text_input("Enter a skill to filter trainers (optional)", "").strip().lower()
-
-        # Let user pick optional value filters from columns
-        col1 = st.selectbox("Optional Filter Column 1", ["None"] + columns)
-        col2 = st.selectbox("Optional Filter Column 2", ["None"] + columns)
-
-        val1 = val2 = None
-        if col1 != "None":
-            val1 = st.selectbox(f"Select value from '{col1}'", sorted(df[col1].dropna().astype(str).unique()))
-        if col2 != "None":
-            val2 = st.selectbox(f"Select value from '{col2}'", sorted(df[col2].dropna().astype(str).unique()))
+        entered_skill = st.text_input("Enter a skill to filter trainers", "").strip().lower()
 
         # Apply filters
         if st.button("Filter Trainers"):
@@ -46,11 +36,6 @@ if uploaded_file:
                         ), axis=1
                     )
                 ]
-
-            if val1:
-                filtered_df = filtered_df[filtered_df[col1].astype(str) == val1]
-            if val2:
-                filtered_df = filtered_df[filtered_df[col2].astype(str) == val2]
 
             st.success(f"Found {len(filtered_df)} matching trainer(s).")
             st.dataframe(filtered_df)
