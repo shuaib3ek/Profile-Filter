@@ -1,20 +1,17 @@
 import streamlit as st
 import pandas as pd
 import requests
-from dotenv import load_dotenv
 import os
 import base64
 from io import StringIO
 
-load_dotenv()
+st.title("Trainer Bulk Email Sender (Streamlit Cloud Ready)")
 
-st.title("Trainer Bulk Email Sender (.env Only + Attachment Support)")
-
-# Load credentials from .env only (no sidebar)
-client_id = os.getenv("CLIENT_ID")
-client_secret = os.getenv("CLIENT_SECRET")
-tenant_id = os.getenv("TENANT_ID")
-sender_email = os.getenv("SENDER_EMAIL")
+# Load credentials from Streamlit Cloud secrets
+client_id = st.secrets["CLIENT_ID"]
+client_secret = st.secrets["CLIENT_SECRET"]
+tenant_id = st.secrets["TENANT_ID"]
+sender_email = st.secrets["SENDER_EMAIL"]
 
 # Upload Excel file
 uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
@@ -114,8 +111,8 @@ if not filtered_df.empty:
         }
         return requests.post(url, headers=headers, json=email_msg)
 
-    if client_id and client_secret and tenant_id and sender_email and subject and body:
-        if st.button("Send Email to All Trainers") and valid_attachment:
+    if subject and body and valid_attachment:
+        if st.button("Send Email to All Trainers"):
             auth_response = get_token(client_id, client_secret, tenant_id)
             token = auth_response.get("access_token", "")
             if not token:
@@ -137,4 +134,4 @@ if not filtered_df.empty:
                             st.code(response.text)
                 st.info(f"✅ Emails sent: {success_count}/{len(filtered_df)}")
     else:
-        st.warning("Please make sure all environment values and email fields are filled.")
+        st.warning("Please enter subject and body before sending.")
